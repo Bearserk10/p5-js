@@ -50,20 +50,25 @@ couleurs.forEach(couleur => {
     ajout.addEventListener("click" , () => {
       const couleurSelectionnee = document.getElementById("colors").value;
       const quantite = document.querySelector("#quantity").value;
-      const nomProduit = `${idData.name}`
-      const imageProduit = `${idData.imageUrl}`;
       let productPanier = {
-        nom: nomProduit,
         id: id,
         couleur: couleurSelectionnee,
         quantite: quantite,
-        images: imageProduit
       };
       console.log(productPanier)
       
       const ajoutProduitLS = () => {
-      productLS.push(productPanier)
-      localStorage.setItem("produit", JSON.stringify(productLS))
+        let produitExiste = false;
+        productLS.forEach((produit) => {
+          if (produit.id === productPanier.id && produit.couleur === productPanier.couleur) {
+            produit.quantite = parseInt(produit.quantite) + parseInt(productPanier.quantite);
+            produitExiste = true;
+          }
+        });
+        if (!produitExiste) {
+          productLS.push(productPanier);
+        }
+        localStorage.setItem("produit", JSON.stringify(productLS));
       }
 
     let productLS = JSON.parse(localStorage.getItem("produit"));
