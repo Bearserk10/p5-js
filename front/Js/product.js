@@ -36,13 +36,6 @@ couleurs.forEach(couleur => {
   option.value = couleur;
   option.text = couleur;
   select.add(option);
-
-
-
-
-
-
-
 });
 
   let ajouterPanier = document.querySelectorAll("button");
