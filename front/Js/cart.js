@@ -88,10 +88,10 @@ if(productLS === null){
           });
           
           //changement de la quantité sur la page panier
-          const itemQuantities = document.querySelectorAll(".itemQuantity");
-            itemQuantities.forEach((quantityInput) => {
-                quantityInput.addEventListener("change", (event) => {
-                    const item = event.target.closest(".cart__item");
+                          const itemQuantities = document.querySelectorAll(".itemQuantity");
+                itemQuantities.forEach((quantityInput) => {
+                  quantityInput.addEventListener("change", (event) => {
+                    const item = event.target.closest('[data-id][data-color]');
                     const id = item.dataset.id;
                     console.log(id)
                     const couleur = item.dataset.color;
@@ -116,3 +116,56 @@ if(productLS === null){
 }
 canapDisplay();
 }
+
+
+const form = document.getElementById('order');
+form.addEventListener('submit', async function(event) {
+  event.preventDefault(); // Empêche la soumission du formulaire
+
+  // Récupère les données saisies par l'utilisateur
+  const contact = {
+    firstName: document.getElementById('firstName').value,
+    lastName: document.getElementById('lastName').value,
+    address: document.getElementById('address').value,
+    city: document.getElementById('city').value,
+    email: document.getElementById('email').value
+  };
+  
+  // Vérifie les données saisies par l'utilisateur
+  if (!isValidEmail(contact.email)) {
+    alert('Veuillez saisir un e-mail valide');
+    return;
+  }
+
+  // Récupère les produits dans le panier
+  const products = getCartItems();
+  
+  // Récupère les données de chaque produit dans le panier
+  for (let i = 0; i < products.length; i++) {
+    const product = await fetchData(products[i].id);
+    produitPanier.push(product);
+  }
+  
+  // Envoie les données à l'API pour valider la commande
+  const order = { contact, products: produitPanier }; // Crée l'objet de commande
+  sendOrder(order); // Envoie la commande à l'API
+});
+
+const fetchData = async (id) => {
+  const response = await fetch(`http://localhost:3000/api/products/${id}`);
+  const data = await response.json();
+  return data;
+};
+
+const sendOrder = async (order) => {
+  const requestOptions = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(order),
+  };
+
+  const response = await fetch('http://localhost:3000/api/products', sendOrder);
+  const data = await response.json();
+  localStorage.setItem('orderId', data.orderId);
+  window.location.href = 'confirmation.html';
+};
