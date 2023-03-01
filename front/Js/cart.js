@@ -118,54 +118,51 @@ canapDisplay();
 }
 
 
-const form = document.getElementById('order');
-form.addEventListener('submit', async function(event) {
-  event.preventDefault(); // Empêche la soumission du formulaire
+const form = document.querySelector('#order');
+const firstName = document.querySelector('#firstName');
+const lastName = document.querySelector('#lastName');
+const address = document.querySelector('#address');
+const city = document.querySelector('#city');
+const email = document.querySelector('#email');
+const orderButton = document.querySelector('#order');
+let productsArray = [];
+const productsFromLocalStorage = localStorage.getItem('produit');
+if (productsFromLocalStorage) {
+  productsArray = JSON.parse(productsFromLocalStorage).map((product) => product._id);
+}
 
-  // Récupère les données saisies par l'utilisateur
-  const contact = {
-    firstName: document.getElementById('firstName').value,
-    lastName: document.getElementById('lastName').value,
-    address: document.getElementById('address').value,
-    city: document.getElementById('city').value,
-    email: document.getElementById('email').value
+form.addEventListener('click', (event) => {
+  event.preventDefault();
+
+  // Récupérer les informations du formulaire
+  const formData = {
+    contact: {
+      firstName: firstName.value,
+      lastName: lastName.value,
+      address: address.value,
+      city: city.value,
+      email: email.value,
+    },
+    products: productsArray
+ 
+
   };
-  
-  // Vérifie les données saisies par l'utilisateur
-  if (!isValidEmail(contact.email)) {
-    alert('Veuillez saisir un e-mail valide');
-    return;
-  }
-
-  // Récupère les produits dans le panier
-  const products = getCartItems();
-  
-  // Récupère les données de chaque produit dans le panier
-  for (let i = 0; i < products.length; i++) {
-    const product = await fetchData(products[i].id);
-    produitPanier.push(product);
-  }
-  
-  // Envoie les données à l'API pour valider la commande
-  const order = { contact, products: produitPanier }; // Crée l'objet de commande
-  sendOrder(order); // Envoie la commande à l'API
-});
-
-const fetchData = async (id) => {
-  const response = await fetch(`http://localhost:3000/api/products/${id}`);
-  const data = await response.json();
-  return data;
-};
-
-const sendOrder = async (order) => {
-  const requestOptions = {
+console.log(formData)
+  // Envoyer les informations à l'API
+  fetch(`http://localhost:3000/api/products/order`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(order),
-  };
-
-  const response = await fetch('http://localhost:3000/api/products', sendOrder);
-  const data = await response.json();
-  localStorage.setItem('orderId', data.orderId);
-  window.location.href = 'confirmation.html';
-};
+    body: JSON.stringify(formData),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      localStorage.setItem('orderId', data.orderId);
+      localStorage.removeItem('produit');
+      console.log(data)
+      window.location.href = './confirmation.html';
+    })
+    .catch((error) => {
+      console.error(error);
+      alert('Une erreur est survenue lors de la validation de la commande. Veuillez réessayer plus tard.');
+    });
+});
