@@ -125,15 +125,28 @@ const address = document.querySelector('#address');
 const city = document.querySelector('#city');
 const email = document.querySelector('#email');
 const orderButton = document.querySelector('#order');
-let productsArray = [];
-const productsFromLocalStorage = localStorage.getItem('produit');
-if (productsFromLocalStorage) {
-  productsArray = JSON.parse(productsFromLocalStorage).map((product) => product._id);
+
+let regName = new RegExp("^[a-zA-ZéèàêëïÈÉÊËÌÍÎÏ,.' -]+$");
+let regAdress = new RegExp("^[A-zÀ-ú0-9 ,.'-]+$");
+let regMail = new RegExp('^[a-zA-Z0-9_. -]+@[a-zA-Z.-]+[.]{1}[a-z]{2,10}$');
+
+productId = []
+for (let p = 0; p < productLS.length; p++) {
+  productId.push(productLS[p].id);
 }
 
-form.addEventListener('click', (event) => {
-  event.preventDefault();
+form.addEventListener('click', function (c) {
+  c.preventDefault();
 
+    productId = [];
+    for (let p = 0; p < productLS.length; p++) {
+        productId.push(productLS[p].id);
+    }
+    requetePost();
+//}
+});
+
+function requetePost(request){
   // Récupérer les informations du formulaire
   const formData = {
     contact: {
@@ -143,26 +156,33 @@ form.addEventListener('click', (event) => {
       city: city.value,
       email: email.value,
     },
-    products: productsArray
- 
-
+    products: productId
   };
-console.log(formData)
-  // Envoyer les informations à l'API
-  fetch(`http://localhost:3000/api/products/order`, {
+  console.log(formData)
+  const heading = {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(formData),
-  })
+    headers: {
+        Accept: 'application.json',
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(order),
+};
+  // Envoyer les informations à l'API
+  fetch('http://localhost:3000/api/products/order', heading)
     .then((response) => response.json())
-    .then((data) => {
-      localStorage.setItem('orderId', data.orderId);
+    .then(function(data) {
       localStorage.removeItem('produit');
-      console.log(data)
-      window.location.href = './confirmation.html';
-    })
+        orderId = data.orderId;
+        console.log(orderId)
+            if (data.orderId != '') {
+                console.log(orderId);
+                location.href = 'confirmation.html?id=' + server.orderId;
+            }
+            console.log(orderId);
+        })
     .catch((error) => {
       console.error(error);
       alert('Une erreur est survenue lors de la validation de la commande. Veuillez réessayer plus tard.');
     });
-});
+}
+
