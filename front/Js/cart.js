@@ -130,17 +130,79 @@ let regName = new RegExp("^[a-zA-ZéèàêëïÈÉÊËÌÍÎÏ,.' -]+$");
 let regAdress = new RegExp("^[A-zÀ-ú0-9 ,.'-]+$");
 let regMail = new RegExp('^[a-zA-Z0-9_. -]+@[a-zA-Z.-]+[.]{1}[a-z]{2,10}$');
 
+const errorFirstName = document.querySelector('#firstNameErrorMsg')
+firstName.addEventListener('change', function(event) {
+  let valueUser = event.target.value;
+  if (regName.test(valueUser)){
+    errorFirstName.innerHTML ='';
+  }else {
+    errorFirstName.innerHTML = 'erreur detecter lors de la saisie de votre prénom veuillez rentrer une valeur valide !'
+  }
+})
+
+const errorLastName = document.querySelector('#lastNameErrorMsg')
+lastName.addEventListener('change', function(event) {
+  let valueUser = event.target.value;
+  if (regName.test(valueUser)){
+    errorLastName.innerHTML ='';
+  }else {
+    errorLastName.innerHTML = 'erreur detecter lors de la saisie de votre nom veuillez rentrer une valeur valide !'
+  }
+})
+
+const errorAddress = document.querySelector('#addressErrorMsg')
+address.addEventListener('change', function(event) {
+  let valueUser = event.target.value;
+  if (regAdress.test(valueUser)){
+    errorAddress.innerHTML ='';
+  }else {
+    errorAddress.innerHTML = 'erreur detecter lors de la saisie de votre adresse veuillez rentrer une valeur valide !'
+  }
+})
+
+const errorCity = document.querySelector('#cityErrorMsg')
+city.addEventListener('change', function(event) {
+  let valueUser = event.target.value;
+  if (regAdress.test(valueUser)){
+    errorCity.innerHTML ='';
+  }else {
+    errorCity.innerHTML = 'erreur detecter lors de la saisie de votre ville veuillez rentrer une valeur valide !'
+  }
+})
+
+const errorEmail = document.querySelector('#emailErrorMsg')
+errorEmail.addEventListener('change', function(event) {
+  let valueUser = event.target.value;
+  if (regMail.test(valueUser)){
+    errorEmail.innerHTML ='';
+  }else {
+    errorEmail.innerHTML = 'erreur detecter lors de la saisie de votre mail veuillez rentrer une valeur valide !'
+  }
+})
+
+
+
 
 
 form.addEventListener('click', function (c) {
   c.preventDefault();
-
+  if (
+    firstName.value === '' ||
+    lastName.value === '' ||
+    address.value === '' ||
+    city.value === '' ||
+    email.value === ''
+  ) {
+    alert('Veuillez renseigner vos coordonnées pour passer commande !');
+  } else if (productLS == null){
+    alert('Votre panier doit contenir des articles pour pouvoir passer un commande !')
+  } else {
     product = [];
     for (let p = 0; p < productLS.length; p++) {
         product.push(productLS[p].id);
     }
     requetePost();
-//}
+  }
 });
 
 function requetePost(request){
@@ -172,8 +234,7 @@ function requetePost(request){
         orderId = data.orderId;
             if (data.orderId != '') {
                 console.log(orderId);
-                localStorage.setItem("orderId", JSON.stringify(orderId));
-                location.href = 'confirmation.html';
+                location.href = 'confirmation.html?id=' + orderId;
             }
             console.log(orderId);
         })
