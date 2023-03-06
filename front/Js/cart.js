@@ -130,17 +130,14 @@ let regName = new RegExp("^[a-zA-ZéèàêëïÈÉÊËÌÍÎÏ,.' -]+$");
 let regAdress = new RegExp("^[A-zÀ-ú0-9 ,.'-]+$");
 let regMail = new RegExp('^[a-zA-Z0-9_. -]+@[a-zA-Z.-]+[.]{1}[a-z]{2,10}$');
 
-productId = []
-for (let p = 0; p < productLS.length; p++) {
-  productId.push(productLS[p].id);
-}
+
 
 form.addEventListener('click', function (c) {
   c.preventDefault();
 
-    productId = [];
+    product = [];
     for (let p = 0; p < productLS.length; p++) {
-        productId.push(productLS[p].id);
+        product.push(productLS[p].id);
     }
     requetePost();
 //}
@@ -156,7 +153,7 @@ function requetePost(request){
       city: city.value,
       email: email.value,
     },
-    products: productId
+    products: product
   };
   console.log(formData)
   const heading = {
@@ -165,7 +162,7 @@ function requetePost(request){
         Accept: 'application.json',
         'Content-Type': 'application/json',
     },
-    body: JSON.stringify(order),
+    body: JSON.stringify(formData),
 };
   // Envoyer les informations à l'API
   fetch('http://localhost:3000/api/products/order', heading)
@@ -173,10 +170,10 @@ function requetePost(request){
     .then(function(data) {
       localStorage.removeItem('produit');
         orderId = data.orderId;
-        console.log(orderId)
             if (data.orderId != '') {
                 console.log(orderId);
-                location.href = 'confirmation.html?id=' + server.orderId;
+                localStorage.setItem("orderId", JSON.stringify(orderId));
+                location.href = 'confirmation.html';
             }
             console.log(orderId);
         })
